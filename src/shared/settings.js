@@ -66,6 +66,7 @@
   const NEWTAB_INPUT_AUTO_FOCUS_CACHE_KEY = '_x_extension_newtab_input_auto_focus_cache_2026_unique_';
   const NEWTAB_LOCALE_CACHE_KEY = '_x_extension_newtab_locale_cache_2026_unique_';
   const NEWTAB_QUOTE_PREFS_STORAGE_KEY = '_x_extension_newtab_quote_prefs_2026_unique_';
+  const NEWTAB_SURFACE_TRANSPARENCY_STORAGE_KEY = '_x_extension_newtab_surface_transparency_2026_unique_';
   // Online wallpaper picks live apart from the shared wallpaper key, which older versions sanitize.
   const NEWTAB_ONLINE_WALLPAPER_STORAGE_KEY = '_x_extension_newtab_online_wallpaper_2026_unique_';
   // Wallpapers added from a link sync as their URLs; each device caches the image itself.
@@ -323,6 +324,7 @@
   // User-controlled preferences that are safe to store in chrome.storage.sync.
   // Keep generated caches, device state, and custom wallpaper media out of this list.
   const CHROME_SYNC_STORAGE_KEYS = Object.freeze([
+    NEWTAB_SURFACE_TRANSPARENCY_STORAGE_KEY,
     THEME_STORAGE_KEY,
     LANGUAGE_STORAGE_KEY,
     RECENT_MODE_STORAGE_KEY,
@@ -1643,6 +1645,7 @@
     NEWTAB_INPUT_AUTO_FOCUS_CACHE_KEY,
     NEWTAB_LOCALE_CACHE_KEY,
     NEWTAB_QUOTE_PREFS_STORAGE_KEY,
+    NEWTAB_SURFACE_TRANSPARENCY_STORAGE_KEY,
     NEWTAB_ONLINE_WALLPAPER_STORAGE_KEY,
     NEWTAB_LINK_WALLPAPERS_STORAGE_KEY,
     NEWTAB_DAILY_WALLPAPER_PICKS_STORAGE_KEY,

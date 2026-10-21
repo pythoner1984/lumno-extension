@@ -2529,7 +2529,8 @@ img[data-favicon-load-state="loaded"] {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.x-nt-bookmark-copy-action {
+.x-nt-bookmark-copy-action,
+.x-nt-bookmark-pin-action {
   all: unset;
   position: absolute;
   right: 7px;
@@ -2577,6 +2578,43 @@ body[data-glass-style] [data-glass-ink-theme="dark"] .x-nt-bookmark-copy-action:
 body[data-glass-style] .x-nt-bookmark-copy-action[data-glass-ink-theme="dark"]:hover,
 body[data-glass-style] .x-nt-bookmark-copy-action[data-glass-ink-theme="dark"]:focus-visible {
   color: #f8fafc;
+}
+.x-nt-bookmark-pin-action { right: 40px; }
+body[data-theme="dark"] .x-nt-bookmark-pin-action,
+body[data-glass-style] [data-glass-ink-theme="dark"] .x-nt-bookmark-pin-action { color: #cbd5e1; }
+.x-nt-bookmark-card--hover .x-nt-bookmark-pin-action,
+.x-nt-bookmark-card:focus-within .x-nt-bookmark-pin-action,
+.x-nt-bookmark-card[data-has-shortcut-action="true"].x-nt-bookmark-card--hover .x-nt-bookmark-copy-action,
+.x-nt-bookmark-card[data-has-shortcut-action="true"]:focus-within .x-nt-bookmark-copy-action,
+.x-nt-bookmark-card[data-bookmark-copy-action-visible="true"] .x-nt-bookmark-pin-action {
+  opacity: 1;
+  transform: translate3d(0, -50%, 0) scale(1);
+}
+.x-nt-bookmark-pin-action:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+.x-nt-bookmark-pin-action:hover { background: var(--x-nt-bookmark-icon-bg, rgba(148, 163, 184, 0.14)); }
+.x-nt-bookmark-pin-action[aria-disabled="true"] { cursor: default; }
+.x-nt-bookmark-card[data-has-shortcut-action="true"].x-nt-bookmark-card--hover .x-nt-bookmark-title,
+.x-nt-bookmark-card[data-has-shortcut-action="true"]:focus-within .x-nt-bookmark-title,
+.x-nt-bookmark-card[data-has-shortcut-action="true"][data-bookmark-copy-action-visible="true"] .x-nt-bookmark-title {
+  box-sizing: border-box;
+  padding-right: 64px;
+}
+@media (hover: none), (pointer: coarse) {
+  .x-nt-bookmark-card[data-has-shortcut-action="true"] .x-nt-bookmark-pin-action,
+  .x-nt-bookmark-card[data-has-shortcut-action="true"] .x-nt-bookmark-copy-action {
+    width: 44px;
+    height: 44px;
+    opacity: 1;
+    transform: translate3d(0, -50%, 0) scale(1);
+  }
+  .x-nt-bookmark-pin-action { right: 51px; }
+  .x-nt-bookmark-card[data-has-shortcut-action="true"] .x-nt-bookmark-title,
+  .x-nt-bookmark-card[data-has-shortcut-action="true"]:focus-within .x-nt-bookmark-title,
+  .x-nt-bookmark-card[data-has-shortcut-action="true"].x-nt-bookmark-card--hover .x-nt-bookmark-title,
+  .x-nt-bookmark-card[data-has-shortcut-action="true"][data-bookmark-copy-action-visible="true"] .x-nt-bookmark-title { padding-right: 88px; }
 }
 .x-nt-folder-preview {
   display: inline-flex;
@@ -3496,7 +3534,8 @@ body[data-glass-style] #_x_extension_newtab_bottom_dock_scroller_2024_unique_[da
   opacity: 0.98;
   transition: none !important;
 }
-.x-nt-bookmark-cascade-copy-trigger {
+.x-nt-bookmark-cascade-copy-trigger,
+.x-nt-bookmark-cascade-pin-trigger {
   all: unset;
   position: absolute;
   right: 3px;
@@ -7226,4 +7265,29 @@ body[data-lumno-page="newtab"] [role="button"] .ri-icon {
   .x-nt-suggestion-visit-button {
     corner-shape: round;
   }
+}
+
+.x-nt-bookmark-cascade-pin-trigger { right: 33px; }
+.x-nt-bookmark-cascade-row:hover .x-nt-bookmark-cascade-pin-trigger,
+.x-nt-bookmark-cascade-row:focus-within .x-nt-bookmark-cascade-pin-trigger {
+  opacity: 1;
+  pointer-events: auto;
+}
+.x-nt-bookmark-cascade-pin-trigger:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+.x-nt-bookmark-cascade-row:has(.x-nt-bookmark-cascade-pin-trigger):is(:hover, :focus-within) .x-nt-bookmark-cascade-label { padding-right: 62px; }
+.x-nt-bookmarks-topbar .x-nt-bookmark-pin-action {
+  right: 2px;
+  width: 28px;
+  height: 28px;
+  color: var(--x-nt-bookmarks-topbar-ink);
+}
+.x-nt-bookmarks-topbar .x-nt-bookmark-card[data-has-shortcut-action="true"]:is(.x-nt-bookmark-card--hover, :focus-within) .x-nt-bookmark-title { padding-right: 30px; }
+@media (hover: none), (pointer: coarse) {
+  .x-nt-bookmark-cascade-pin-trigger, .x-nt-bookmark-cascade-copy-trigger { width: 44px; height: 44px; margin-top: -22px; opacity: 1; pointer-events: auto; }
+  .x-nt-bookmark-cascade-pin-trigger { right: 47px; }
+  .x-nt-bookmark-cascade-row:has(.x-nt-bookmark-cascade-pin-trigger) .x-nt-bookmark-cascade-label { padding-right: 94px; }
+  .x-nt-bookmark-cascade-row:has(.x-nt-bookmark-cascade-pin-trigger) .x-nt-bookmark-cascade-item { min-height: 44px; }
+  .x-nt-bookmarks-topbar .x-nt-bookmark-card[data-has-shortcut-action="true"] { min-height: 44px; }
+  .x-nt-bookmarks-topbar .x-nt-bookmark-card[data-has-shortcut-action="true"] .x-nt-bookmark-pin-action { width: 44px; height: 44px; }
+  .x-nt-bookmarks-topbar .x-nt-bookmark-card[data-has-shortcut-action="true"] .x-nt-bookmark-title { padding-right: 44px; }
 }

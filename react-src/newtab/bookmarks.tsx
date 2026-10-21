@@ -2,6 +2,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
   type FocusEvent as ReactFocusEvent,
   type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
@@ -49,6 +50,7 @@ export interface BookmarkCardElement extends HTMLDivElement {
     options?: VisualOptions
   ) => void;
   _xDisposeBookmarkCard?: () => void;
+  _xSyncBookmarkShortcutState?: () => void;
 }
 
 interface ThemeSuggestion {
@@ -140,6 +142,8 @@ export interface BookmarksViewOptions {
     card: BookmarkCardElement
   ) => void;
   copyUrl?: (url?: string) => boolean | Promise<boolean>;
+  addShortcut?: (item: BookmarkItem) => boolean | Promise<boolean>;
+  hasShortcut?: (item: BookmarkItem) => boolean;
   navigateToUrl?: (url?: string) => void;
   openUrl?: (url?: string, options?: OpenUrlOptions) => void;
   onItemContextMenu?: (payload: {
@@ -217,6 +221,8 @@ interface NormalizedBookmarksOptions {
   openFolder: NonNullable<BookmarksViewOptions['openFolder']>;
   openFolderMenu: NonNullable<BookmarksViewOptions['openFolderMenu']>;
   copyUrl: NonNullable<BookmarksViewOptions['copyUrl']>;
+  addShortcut: BookmarksViewOptions['addShortcut'];
+  hasShortcut: NonNullable<BookmarksViewOptions['hasShortcut']>;
   openUrl: NonNullable<BookmarksViewOptions['openUrl']>;
   onItemContextMenu: NonNullable<
     BookmarksViewOptions['onItemContextMenu']
@@ -252,6 +258,7 @@ export interface BookmarksViewController {
   getCacheKey(item: BookmarkItem): string;
   setFolderIconsVisible(value: boolean): boolean;
   getCards(): BookmarkCardElement[];
+  refreshShortcutStates(): void;
 }
 
 function fallbackFormatMessage(
@@ -435,6 +442,8 @@ function normalizeOptions(
       typeof rawOptions.copyUrl === 'function'
         ? rawOptions.copyUrl
         : () => Promise.resolve(false),
+    addShortcut: typeof rawOptions.addShortcut === 'function' ? rawOptions.addShortcut : undefined,
+    hasShortcut: typeof rawOptions.hasShortcut === 'function' ? rawOptions.hasShortcut : () => false,
     openUrl:
       typeof rawOptions.openUrl === 'function'
         ? rawOptions.openUrl
@@ -536,9 +545,46 @@ function BookmarkCard({
   const menuVisualLockedRef = useRef(false);
   const folderExpandedRef = useRef(false);
   const copyActionFocusedRef = useRef(false);
+  const [shortcutAdded, setShortcutAdded] = useState(() => options.hasShortcut(item));
+  const [pinBusy, setPinBusy] = useState(false);
+  const [pinFailed, setPinFailed] = useState(false);
+  const pinBusyRef = useRef(false);
+  const pinRequestRef = useRef(0);
 
   const isTopbarMode = viewMode === 'top';
   const isFolder = item.type === 'folder';
+  const hasPinAction = !isFolder && Boolean(options.addShortcut);
+  const pinLabel = shortcutAdded
+    ? options.t('newtab_shortcuts_already_added', 'Already in shortcuts')
+    : pinFailed ? options.t('bookmarks_add_shortcut_failed', 'Could not add shortcut. Try again.')
+    : options.t('bookmarks_add_shortcut', 'Add to shortcuts');
+
+  useLayoutEffect(() => {
+    pinRequestRef.current += 1;
+    pinBusyRef.current = false;
+    setPinBusy(false);
+    setPinFailed(false);
+    setShortcutAdded(options.hasShortcut(item));
+    return () => { pinRequestRef.current += 1; };
+  }, [item.url, item.id, item.type, options]);
+
+  async function pinBookmark(): Promise<void> {
+    if (pinBusyRef.current || options.hasShortcut(item) || !options.addShortcut) return;
+    pinBusyRef.current = true;
+    const request = pinRequestRef.current;
+    setPinBusy(true);
+    setPinFailed(false);
+    try {
+      const saved = await options.addShortcut(item);
+      if (request !== pinRequestRef.current) return;
+      setShortcutAdded(options.hasShortcut(item));
+      setPinFailed(!saved && !options.hasShortcut(item));
+    } catch {
+      if (request === pinRequestRef.current) setPinFailed(true);
+    } finally {
+      if (request === pinRequestRef.current) { pinBusyRef.current = false; setPinBusy(false); }
+    }
+  }
   const folderIconId = String(item.id || `folder-${index}`);
   const folderIconHtml = useMemo(() => ({
     __html: isFolder ? options.getFigmaFolderSvg(`bookmark-${folderIconId}`, item.id) : ''
@@ -807,6 +853,7 @@ function BookmarkCard({
     card._xSetBookmarkMenuVisualActive =
       isFolder && menuMode ? setMenuVisualLocked : undefined;
     card._xDisposeBookmarkCard = dispose;
+    card._xSyncBookmarkShortcutState = () => setShortcutAdded(options.hasShortcut(item));
 
     if (!isTopbarMode) {
       options.applyCardTheme(card, immediateTheme, host);
@@ -853,7 +900,7 @@ function BookmarkCard({
           const eventTarget = event?.target;
           if (
             eventTarget instanceof Element &&
-            eventTarget.closest('.x-nt-bookmark-copy-action')
+            eventTarget.closest('.x-nt-bookmark-copy-action, .x-nt-bookmark-pin-action')
           ) {
             return false;
           }
@@ -926,6 +973,7 @@ function BookmarkCard({
         Number.isFinite(bookmarkIndex) ? String(bookmarkIndex) : ''
       }
       data-bookmark-draggable={draggable ? 'true' : 'false'}
+      data-has-shortcut-action={hasPinAction ? 'true' : undefined}
       onPointerEnter={activateBookmarkHoverVisual}
       onPointerLeave={deactivateBookmarkHoverVisual}
       onPointerCancel={deactivateBookmarkHoverVisual}
@@ -1011,6 +1059,23 @@ function BookmarkCard({
       <span ref={titleRef} className="x-nt-bookmark-title">
         {safeTitleText}
       </span>
+      {hasPinAction ? <button type="button" className="x-nt-bookmark-pin-action"
+        title={pinLabel} aria-label={`${pinLabel}: ${safeTitleText}`}
+        aria-disabled={pinBusy || shortcutAdded} aria-busy={pinBusy}
+        data-added={shortcutAdded ? 'true' : 'false'}
+        dangerouslySetInnerHTML={{ __html: options.getRiSvg(
+          pinBusy ? 'ri-loader-4-line' : shortcutAdded ? 'ri-pushpin-fill' : 'ri-pushpin-line', 'ri-size-16') }}
+        onPointerEnter={() => options.hideCursorTooltip()}
+        onFocus={() => options.hideCursorTooltip()}
+        onPointerDown={event => event.stopPropagation()}
+        onKeyDown={event => event.stopPropagation()}
+        onAuxClick={event => { event.preventDefault(); event.stopPropagation(); }}
+        onContextMenu={event => event.stopPropagation()}
+        onClick={event => {
+          event.preventDefault(); event.stopPropagation(); options.hideCursorTooltip();
+          if (options.isActivationSuppressed()) return;
+          void pinBookmark();
+        }} /> : null}
       {!isFolder && !isTopbarMode ? (
         <button
           type="button"
@@ -1129,6 +1194,7 @@ function createNoopController(
 ): BookmarksViewController {
   const cards = Array.isArray(rawOptions.cards) ? rawOptions.cards : [];
   return {
+    refreshShortcutStates() {},
     appendEmptyFolderState() {},
     clear() {
       cards.length = 0;
@@ -1265,6 +1331,9 @@ export function createBookmarksView(
 
   return {
     appendEmptyFolderState,
+    refreshShortcutStates() {
+      options.cards.forEach(card => card._xSyncBookmarkShortcutState?.());
+    },
     clear,
     render,
     getSignature: getBookmarksSignature,

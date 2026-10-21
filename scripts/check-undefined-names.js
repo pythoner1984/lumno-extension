@@ -75,9 +75,11 @@ function checkUndefinedNames(files) {
   const readFile = host.readFile.bind(host);
   const fileExists = host.fileExists.bind(host);
   const getSourceFile = host.getSourceFile.bind(host);
-  host.readFile = (fileName) => (fileName === ambientPath ? ambientSource : readFile(fileName));
-  host.fileExists = (fileName) => fileName === ambientPath || fileExists(fileName);
-  host.getSourceFile = (fileName, languageVersion, ...rest) => (fileName === ambientPath
+  // TypeScript uses forward slashes even when path.join returns Windows paths.
+  const isAmbient = (fileName) => path.resolve(fileName) === ambientPath;
+  host.readFile = (fileName) => (isAmbient(fileName) ? ambientSource : readFile(fileName));
+  host.fileExists = (fileName) => isAmbient(fileName) || fileExists(fileName);
+  host.getSourceFile = (fileName, languageVersion, ...rest) => (isAmbient(fileName)
     ? ts.createSourceFile(fileName, ambientSource, languageVersion)
     : getSourceFile(fileName, languageVersion, ...rest));
   const program = ts.createProgram([...files, ambientPath], options, host);

@@ -164,13 +164,14 @@ const assertWithinBudget = (actualBytes, budgetKiB, label) => {
 // the total to 821 KiB. Its IME-safe keys and the page's own text field for the filter move
 // the New Tab route to 426 KiB, the Options route to 86 KiB gzip and the total to 822 KiB.
 const bundleBudgets = {
-  newtab: { uncompressed: 426, gzip: 127 },
+  // Personal build adds bookmark pins and two appearance controls (< 4 KiB raw).
+  newtab: { uncompressed: 430, gzip: 129 },
   options: { uncompressed: 290, gzip: 86 },
   overlay: { uncompressed: 275, gzip: 83 },
   // The toolbar popup opens on every click, so it loads only the runtime, the
   // shared chunk and its own small entry.
   popup: { uncompressed: 220, gzip: 70 },
-  total: { uncompressed: 822, gzip: 239 }
+  total: { uncompressed: 826, gzip: 241 }
 };
 
 const bootstrapScript = 'src="../shared/react-page-bootstrap.js"';

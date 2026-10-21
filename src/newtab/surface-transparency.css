@@ -1,0 +1,48 @@
+/* Scale only the surface paint, never the controls, labels or favicon artwork.
+   At zero the original theme and adaptive wallpaper styling are unchanged. */
+body:not([data-glass-style])[data-search-transparency][data-lumno-page="newtab"]:not([data-nt-suggestions-open="true"]) #_x_extension_newtab_root_2024_unique_ {
+  background: color-mix(in srgb, var(--x-nt-panel-bg) calc(var(--x-nt-search-surface-strength) * 100%), transparent);
+  border-color: color-mix(in srgb, var(--x-nt-search-shell-border) calc(var(--x-nt-search-surface-strength) * 100%), transparent);
+  backdrop-filter: blur(calc(var(--x-nt-panel-blur, 24px) * var(--x-nt-search-surface-strength)));
+  -webkit-backdrop-filter: blur(calc(var(--x-nt-panel-blur, 24px) * var(--x-nt-search-surface-strength)));
+}
+body[data-lumno-page="newtab"][data-search-transparency="100"]:not([data-nt-suggestions-open="true"]) #_x_extension_newtab_root_2024_unique_ {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body:not([data-glass-style])[data-shortcut-transparency] .x-nt-shortcut-icon:not(.x-nt-shortcut-icon--add) {
+  background: color-mix(in srgb, var(--x-nt-shortcut-wallpaper-icon-bg, var(--x-nt-shortcut-icon-bg, rgba(241, 245, 249, 0.9))) calc(var(--x-nt-shortcut-surface-strength) * 100%), transparent);
+}
+body:not([data-glass-style])[data-theme="dark"][data-shortcut-transparency] .x-nt-shortcut-icon:not(.x-nt-shortcut-icon--add) {
+  background: color-mix(in srgb, var(--x-nt-shortcut-wallpaper-icon-bg, var(--x-nt-shortcut-icon-bg, rgba(255, 255, 255, 0.09))) calc(var(--x-nt-shortcut-surface-strength) * 100%), transparent);
+}
+/* Glass retains its own color, lighting and refraction at intermediate values.
+   Only the paint fades; an open search menu keeps its readable glass surface. */
+body[data-glass-style][data-search-transparency]:not([data-nt-suggestions-open="true"]) #_x_extension_newtab_root_2024_unique_:not(:has(.x-lumno-search-input-mode__menu:not([hidden]))) {
+  --x-nt-glass-tint-alpha: calc((var(--x-nt-glass-tint-thin) + (var(--x-nt-glass-tint-dense) - var(--x-nt-glass-tint-thin)) * var(--x-nt-glass-density, 0.35)) * var(--x-nt-search-surface-strength));
+}
+body[data-glass-style][data-shortcut-transparency] .x-nt-shortcut-icon:not(.x-nt-shortcut-icon--add) {
+  --x-nt-glass-tint-alpha: calc((var(--x-nt-glass-tint-thin) + (var(--x-nt-glass-tint-dense) - var(--x-nt-glass-tint-thin)) * var(--x-nt-glass-density, 0.35)) * var(--x-nt-shortcut-surface-strength));
+}
+body[data-lumno-page="newtab"][data-shortcut-transparency="100"] .x-nt-shortcut-icon:not(.x-nt-shortcut-icon--add) {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body[data-shortcut-transparency] .x-nt-shortcut-favicon-mask[data-icon-plate="true"] {
+  background: color-mix(in srgb, var(--x-nt-shortcut-icon-plate-light, white) calc(var(--x-nt-shortcut-surface-strength) * 100%), transparent);
+}
+body[data-theme="dark"][data-shortcut-transparency] .x-nt-shortcut-favicon-mask[data-icon-plate="true"],
+body[data-shortcut-transparency] [data-glass-ink-theme="dark"] .x-nt-shortcut-favicon-mask[data-icon-plate="true"] {
+  background: color-mix(in srgb, var(--x-nt-shortcut-icon-plate-dark, rgb(58 58 60)) calc(var(--x-nt-shortcut-surface-strength) * 100%), transparent);
+}
+.x-nt-surface-transparency-hint {
+  margin: 6px 0 0;
+  color: var(--x-nt-subtext);
+  font-size: var(--lumno-font-size-sm, 12px);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}

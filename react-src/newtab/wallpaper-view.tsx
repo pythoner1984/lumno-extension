@@ -487,6 +487,18 @@ function StaticRowTabs({
   );
 }
 
+function TransparencyControl({ field }: { field: 'search' | 'shortcut' }) {
+  return <div className="x-nt-overlay-control">
+    <RangeSliderField {...ref(`${field}TransparencySlider`)} min="0" max="100" step="1" defaultValue="0"
+      className="x-nt-overlay-slider-wrap" inputClass="x-nt-overlay-slider" rowClassName="x-nt-range-slider-row"
+      label={<span {...ref(`${field}TransparencyLabel`)} className="x-nt-appearance-setting-title" />}
+      valueInputProps={{ ...ref(`${field}TransparencyValue`), defaultValue: '0', inputMode: 'numeric' }}
+      data-value-suffix="%"
+      resetButtonProps={{ ...ref(`${field}TransparencyReset`), disabled: true }} />
+    <p {...ref(`${field}TransparencyHint`)} className="x-nt-surface-transparency-hint" />
+  </div>;
+}
+
 // Whole-number slider another runtime drives.
 function StaticCountSlider({
   defaultValue,
@@ -1245,6 +1257,7 @@ function WallpaperPanel({
                   toggle={state.search.autoFocus.toggle}
                 />
               </div>
+              <TransparencyControl field="search" />
               <div className="x-nt-appearance-setting-row x-nt-top-content-header">
                 <div {...ref('topContentTitle')} className="x-nt-appearance-setting-title">
                   {state.search.topContent.title}
@@ -1441,6 +1454,7 @@ function WallpaperPanel({
                 role="region"
               >
                 <div className="x-nt-shortcuts-accordion-details-inner">
+                  <TransparencyControl field="shortcut" />
                   <div className="x-nt-appearance-setting-row">
                     <span {...ref('shortcutAddTitle')} className="x-nt-appearance-setting-title">
                       {shortcuts.add.title}
@@ -1562,7 +1576,7 @@ function WallpaperPanel({
           <div className="x-nt-panel-divider" />
           <ToggleSection arrowIcon={arrowIcon} name="recentSettings">
             <SettingRow titleRef="recentModeLabel">
-              <StaticRowTabs attribute="data-recent-mode" name="recentMode" values={['latest', 'most']} />
+              <StaticRowTabs attribute="data-recent-mode" name="recentMode" values={['latest', 'most', 'custom']} />
             </SettingRow>
             <SettingRow titleRef="recentRowsLabel">
               <StaticRowTabs attribute="data-recent-rows" labeled name="recentRows" values={['1', '2']} />

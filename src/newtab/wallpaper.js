@@ -270,6 +270,9 @@
         return '<i class="ri-icon ' + size + ' ' + id + '" aria-hidden="true"></i>';
       };
     const showToast = typeof options.showToast === 'function' ? options.showToast : function() {};
+    const surfaceTransparency = globalThis.LumnoSurfaceTransparency?.createRuntime({
+      documentObj, chromeObj: chrome, storageArea, t, showToast
+    });
     const beginToast = typeof options.beginToast === 'function'
       ? options.beginToast
       : function() {
@@ -2346,7 +2349,7 @@
           resolve();
         });
       });
-      return initialWallpaperOverlayReadyPromise;
+      return initialWallpaperOverlayReadyPromise.then(() => surfaceTransparency?.ready);
     }
 
     function normalizeWallpaperEffectPrefs(value) {
@@ -5392,6 +5395,7 @@
       const refs = getWallpaperPanelRefs();
       const quoteRuntime = options.getQuoteRuntime && options.getQuoteRuntime();
       if (quoteRuntime) quoteRuntime.bindSettings(refs, wallpaperViewController);
+      surfaceTransparency?.bindSettings(refs);
       const sectionSettings = options.getSectionPanelSettings && options.getSectionPanelSettings();
       if (sectionSettings) {
         sectionSettings.bindSettings(refs, wallpaperViewController, {
@@ -5788,6 +5792,7 @@
       }
       const quoteRuntime = options.getQuoteRuntime && options.getQuoteRuntime();
       if (quoteRuntime) quoteRuntime.updateLanguage();
+      surfaceTransparency?.updateLanguage();
       const sectionSettings = options.getSectionPanelSettings && options.getSectionPanelSettings();
       if (sectionSettings) sectionSettings.updateLanguage();
     }

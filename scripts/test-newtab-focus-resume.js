@@ -84,6 +84,10 @@ function bootPage(options = {}) {
 }
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+async function waitUntil(predicate) {
+  const deadline = Date.now() + 1000;
+  while (!predicate() && Date.now() < deadline) await wait(10);
+}
 
 function createResume(page, overrides = {}) {
   const calls = [];
@@ -203,7 +207,7 @@ async function main() {
     assert.strictEqual(page.documentElement.getAttribute('data-nt-focus-route-pending'), null);
     assert.strictEqual(skipped, 1, 'the held old frame gives way at once');
     assert.deepStrictEqual(calls[calls.length - 1], ['focus']);
-    await wait(10);
+    await waitUntil(() => page.documentElement.getAttribute('data-nt-focus-resume-settling') === null);
     assert.strictEqual(page.documentElement.getAttribute('data-nt-focus-resume-settling'), null);
   }
 

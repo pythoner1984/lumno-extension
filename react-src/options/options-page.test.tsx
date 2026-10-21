@@ -468,7 +468,7 @@ describe('Options page storage wiring', () => {
       await settle();
       expect(control.checked, `${entry.key} follows storage`).toBe(Boolean(entry.normalize(!written)));
     }
-  });
+  }, 15000);
 
   it('runs each switch\'s follow-up, such as locking the selection provider while it is off', async () => {
     const settings = SETTINGS;

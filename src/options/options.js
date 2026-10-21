@@ -2000,7 +2000,7 @@
   }
 
   function setRecentModeTabState(mode) {
-    const nextMode = mode === 'most' ? 'most' : 'latest';
+    const nextMode = mode === 'custom' ? 'custom' : mode === 'most' ? 'most' : 'latest';
     currentRecentMode = nextMode;
     renderSegmentedControlState(
       recentModeTabsController,
@@ -2017,6 +2017,11 @@
             value: 'most',
             labelKey: 'recent_mode_most',
             label: getMessage('recent_mode_most', '最常访问')
+          },
+          {
+            value: 'custom',
+            labelKey: 'recent_mode_custom',
+            label: getMessage('recent_mode_custom', '自定义')
           }
         ],
         select: {
@@ -2025,7 +2030,7 @@
       },
       recentModeTabButtons,
       'data-recent-mode',
-      (value) => value === 'most' ? 'most' : 'latest'
+      (value) => value === 'custom' ? 'custom' : value === 'most' ? 'most' : 'latest'
     );
   }
 
@@ -2357,7 +2362,7 @@
   }
 
   function handleRecentModeSelection(value) {
-    const nextMode = value === 'most' ? 'most' : 'latest';
+    const nextMode = value === 'custom' ? 'custom' : value === 'most' ? 'most' : 'latest';
     setRecentModeTabState(nextMode);
     if (recentModeSelect) {
       recentModeSelect.value = nextMode;
@@ -4054,10 +4059,8 @@
   });
   settingBinder.bindSetting({
     key: RECENT_MODE_STORAGE_KEY,
-    // A missing or unknown mode starts as "most visited"; a later change to
-    // anything but "most" shows "latest", as the switch only offers the two.
-    normalize: (value) => (value === 'latest' || value === 'most' ? value : 'most'),
-    normalizeChange: (value) => (value === 'most' ? 'most' : 'latest'),
+    normalize: (value) => (['latest', 'most', 'custom'].includes(value) ? value : 'most'),
+    normalizeChange: (value) => (value === 'custom' ? 'custom' : value === 'most' ? 'most' : 'latest'),
     apply(mode) {
       if (recentModeSelect) {
         recentModeSelect.value = mode;

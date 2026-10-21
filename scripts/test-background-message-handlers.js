@@ -211,7 +211,7 @@ async function testLocaleMessagesAreCachedAndCanBeNarrowed() {
   const full = await harness.sendMessage({ action: 'getLocaleMessages', locale: 'en' });
   assert.deepStrictEqual(Object.keys(full.messages).sort(), ['copy_page_url_success', 'unrelated_key']);
   assert.strictEqual(
-    fetched.filter((url) => url.endsWith('_locales/en/messages.json')).length,
+    fetched.filter((url) => url.replaceAll('\\', '/').endsWith('_locales/en/messages.json')).length,
     1,
     'a locale file should be read once per worker lifetime'
   );

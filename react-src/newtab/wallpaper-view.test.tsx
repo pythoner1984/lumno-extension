@@ -230,7 +230,14 @@ describe('New Tab React wallpaper view', () => {
     expect(refs().effectSelectHost.closest('.x-nt-appearance-setting-row'))
       .toBe(refs().effectLabel.parentElement);
     const sliderRows = view.control.querySelectorAll<HTMLElement>('.x-nt-range-slider-row');
-    expect(sliderRows).toHaveLength(18);
+    expect(sliderRows).toHaveLength(20);
+    for (const field of ['search', 'shortcut']) {
+      const slider = refs()[`${field}TransparencySlider`] as HTMLInputElement;
+      expect(slider.min).toBe('0');
+      expect(slider.max).toBe('100');
+      expect(refs()[`${field}TransparencyValue`]).toBeDefined();
+      expect(refs()[`${field}TransparencyReset`]).toBeDefined();
+    }
     sliderRows.forEach((row) => {
       const slider = row.querySelector<HTMLInputElement>('input[type="range"]');
       const valueInput = row.querySelector<HTMLInputElement>('input[type="number"]');

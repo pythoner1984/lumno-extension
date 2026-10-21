@@ -313,6 +313,10 @@
       event.stopPropagation();
       hideCursorTooltip();
       hideTopActionTooltip();
+      if (item._xCustom && deps.onCustomSiteEdit) {
+        deps.onCustomSiteEdit(item);
+        return;
+      }
       openRecentContextMenu({ item, element }, event);
     }
 

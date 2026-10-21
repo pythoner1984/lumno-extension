@@ -273,7 +273,7 @@ export function getRecentSitesSignature(items: RecentSiteItem[]): string {
       ? String(item.lastVisitTime)
       : '';
     const visitCount = item?.visitCount ? String(item.visitCount) : '';
-    const base = `${index}::${url}::${title}::${siteName}::${lastVisitTime}::${visitCount}`;
+    const base = `${index}::${url}::${title}::${siteName}::${lastVisitTime}::${visitCount}${item?._xCustom ? '::custom' : ''}`;
     return item?.progressTracking === true ? `${base}::tracking` : base;
   }).join('\n');
 }
@@ -485,7 +485,7 @@ function RecentSiteCard({
       );
   const siteName = ownExtensionDisplay
     ? ownExtensionDisplay.siteName
-    : options.getSiteDisplayName(host, itemTitle);
+    : item._xCustom ? String(item.siteName || itemTitle) : options.getSiteDisplayName(host, itemTitle);
   const titleText = ownExtensionDisplay
     ? ownExtensionDisplay.titleText
     : (itemTitle || siteName || itemUrl);
@@ -999,6 +999,7 @@ function RecentSiteCard({
             disabled={pinAction.pending}
             type="button"
             className="x-nt-recent-pin"
+            hidden={item._xCustom === true}
             onPointerDown={stopCardActivation}
             onClick={(event) => {
               stopCardActivation(event);

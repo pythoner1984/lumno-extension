@@ -9,6 +9,7 @@ const repoRoot = path.join(__dirname, '..');
 const manifest = JSON.parse(fs.readFileSync(path.join(repoRoot, 'manifest.json'), 'utf8'));
 const expectedDevelopmentExtensionId = 'kkcjcneagmlhpeaafngjdlpcfjakejgb';
 const expectedSyncKeys = [
+  '_x_extension_newtab_surface_transparency_2026_unique_',
   '_x_extension_theme_mode_2024_unique_',
   '_x_extension_language_2024_unique_',
   '_x_extension_recent_mode_2024_unique_',
